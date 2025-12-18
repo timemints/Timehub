@@ -1,0 +1,64 @@
+import { useState, useRef, useEffect } from "react";
+import { Helmet } from "react-helmet-async";
+import { Link } from "react-router-dom";
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
+
+export default function Timer() {
+
+  return (
+    <>
+      <Helmet>
+        <title>Time Hub – Free Online Timer</title>
+        <meta
+          name="google-site-verification"
+          content="dFAYEWjddhUgNk369ubt5XRckyjCrKESjsbPajX6w7g"
+        />
+      </Helmet>     
+      <Header />
+
+      {/* Your timer UI already exists below */}
+
+      <Footer />
+    </>
+  );
+}    
+
+  
+
+  const playAlarm = useCallback(() => {
+    if (soundEnabled && audioRef.current) {
+      audioRef.current.play().catch(() => {});
+    }
+  }, [soundEnabled]);
+
+  useEffect(() => {
+    if (isRunning && timeLeft > 0) {
+      intervalRef.current = setInterval(() => {
+        setTimeLeft((prev) => {
+          if (prev <= 1) {
+            setIsRunning(false);
+            playAlarm();
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    } else {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+    }
+
+    return () => {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+    };
+  }, [isRunning, playAlarm]);
+
+  const formatTime = (totalSeconds: number) => {
+    const hrs = Math.floor(totalSeconds / 3600);
+    const mins = Math.floor((totalSeconds % 3600) / 60);
+    const secs = totalSeconds % 60;
+    return {
+      hours: hrs.toString().padStart(2, "0"),
+      minutes: mins.toString().padStart(2, "0"),
+      seconds: secs.toString().padStart(2, "0"),
+    };
